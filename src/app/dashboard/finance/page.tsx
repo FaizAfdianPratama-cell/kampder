@@ -1,6 +1,6 @@
 // src/app/dashboard/finance/page.tsx
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import {
   Plus, Loader, Trash2, Pencil, FileText, X,
   Wallet, Search, RotateCcw, Scale,
@@ -60,7 +60,7 @@ function defaultRange() {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function FinancePage() {
+function FinancePageContent() {
   const { t, lang, theme, colors } = useApp();
   const isDark = theme === "dark";
   const locale = lang === "id" ? idLocale : enUS;
@@ -533,5 +533,12 @@ export default function FinancePage() {
         </div>
       )}
     </div>
+  );
+}
+export default function FinancePage() {
+  return (
+    <Suspense fallback={null}>
+      <FinancePageContent />
+    </Suspense>
   );
 }
