@@ -83,6 +83,13 @@ export default function InstallAppCard({ dismissible = true }: Props) {
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === "accepted") {
       setPlatform("already-installed");
+      // Langsung minta izin notifikasi begitu app berhasil di-install
+      try {
+        const OneSignal = (await import("react-onesignal")).default;
+        await OneSignal.Notifications.requestPermission();
+      } catch (err) {
+        console.error("Gagal minta izin notifikasi setelah install:", err);
+      }
     }
     setDeferredPrompt(null);
   }
