@@ -1,7 +1,7 @@
 
 // src/app/dashboard/tasks/page.tsx
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import {
   Trash2, CheckCircle2, Loader, Pencil, X,
   RotateCcw, Plus, CalendarDays, ListFilter,
@@ -40,7 +40,7 @@ function safePrio(p: string | null | undefined): Priority {
   return PRIO_ORDER.includes(p as Priority) ? (p as Priority) : "SEDANG";
 }
 
-export default function TasksPage() {
+function TasksPageContent() {
   const { t, lang, theme, colors } = useApp();
   const isDark = theme === "dark";
   const locale = lang === "id" ? idLocale : enUS;
@@ -473,5 +473,12 @@ export default function TasksPage() {
         </div>
       )}
     </div>
+  );
+}
+export default function TasksPage() {
+  return (
+    <Suspense fallback={null}>
+      <TasksPageContent />
+    </Suspense>
   );
 }
