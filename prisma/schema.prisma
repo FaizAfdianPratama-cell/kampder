@@ -1,0 +1,161 @@
+// prisma/schema.prisma
+
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  phone         String?
+  institution   String?
+  fontPreference  String  @default("roboto")
+  themePreference String  @default("dark")
+  langPreference  String  @default("id")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts     Account[]
+  sessions     Session[]
+  tasks        Task[]
+  transactions Transaction[]
+  budgets      Budget[]
+  otpCodes     OtpCode[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model OtpCode {
+  id        String   @id @default(cuid())
+  userId    String?
+  target    String
+  type      OtpType
+  code      String
+  used      Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Task {
+  id          String     @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  subject     String
+  deadline    DateTime
+  priority    Priority   @default(SEDANG)
+  status      TaskStatus @default(BELUM)
+  type        TaskType   @default(TUGAS)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id             String          @id @default(cuid())
+  userId         String
+  name           String
+  type           TransactionType
+  amount         Int
+  category       String
+  customCategory String?
+  date           DateTime        @default(now())
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Budget {
+  id          String   @id @default(cuid())
+  userId      String
+  category    String
+  limitAmount Int
+  month       Int
+  year        Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, category, month, year])
+}
+
+enum Priority {
+  TERTINGGI
+  TINGGI
+  SEDANG
+  RENDAH
+}
+
+enum TaskStatus {
+  BELUM
+  DIKERJAKAN
+  SELESAI
+}
+
+enum TaskType {
+  TUGAS
+  JADWAL
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  INVEST
+}
+
+enum OtpType {
+  EMAIL_RESET
+  PHONE_RESET
+  EMAIL_VERIFY
+  PHONE_VERIFY
+}

@@ -1,0 +1,185 @@
+/* url(globals.css) */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+html body,
+html .kd-shell,
+html .kd-page {
+  background-color: #0E1117; /* dark — default */
+}
+
+html[data-theme="light"],
+html[data-theme="light"] body,
+html[data-theme="light"] .kd-shell,
+html[data-theme="light"] .kd-page {
+  background-color: #F4F7FC; /* light */
+}
+
+/* ─── App-level tokens ──────────────────────────────────────────────────── */
+:root {
+  --app-font: 'Roboto', sans-serif;
+
+  /* Responsive spacing — clamp(mobile, fluid, desktop) */
+  --sp-xs:  clamp(6px,  1.5vw, 12px);
+  --sp-sm:  clamp(10px, 2vw,   18px);
+  --sp-md:  clamp(14px, 2.5vw, 24px);
+  --sp-lg:  clamp(18px, 3vw,   32px);
+  --sp-xl:  clamp(24px, 4vw,   48px);
+
+  /* Responsive font scale */
+  --fs-xs:   clamp(10px, 1.4vw, 13px);
+  --fs-sm:   clamp(12px, 1.7vw, 15px);
+  --fs-base: clamp(14px, 2vw,   17px);
+  --fs-md:   clamp(16px, 2.4vw, 20px);
+  --fs-lg:   clamp(20px, 3vw,   26px);
+  --fs-xl:   clamp(24px, 4vw,   34px);
+
+  /* Layout */
+  --page-max:    100%;
+  --page-pad:    clamp(16px, 4vw, 32px);
+  --card-radius: clamp(12px, 2vw,  20px);
+  --btn-radius:  clamp(10px, 1.5vw, 14px);
+  --nav-h:       clamp(60px, 9vw,   80px);
+}
+
+/* ─── Universal reset ────────────────────────────────────────────────────── */
+* {
+  font-family: var(--app-font) !important;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: var(--app-font);
+  margin: 0;
+}
+
+input, select, textarea, button {
+  font-family: var(--app-font) !important;
+}
+
+/* ─── Form elements ──────────────────────────────────────────────────────── */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.4);
+  cursor: pointer;
+}
+select option {
+  background: #1A2235;
+  color: #EEF2F8;
+}
+::placeholder {
+  color: rgba(138, 160, 184, 0.5);
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(123, 184, 240, 0.25);
+  border-radius: 99px;
+}
+
+/* ─── Layout shell ───────────────────────────────────────────────────────── */
+.kd-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+}
+
+.kd-page {
+  width: 100%;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.kd-body {
+  flex: 1;
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 12px);
+}
+
+/* ─── Page-level padding helpers ─────────────────────────────────────────── */
+.kd-px { padding-left: var(--page-pad); padding-right: var(--page-pad); }
+.kd-py { padding-top: var(--sp-md); padding-bottom: var(--sp-md); }
+
+/* ─── Sticky header ──────────────────────────────────────────────────────── */
+.kd-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* ─── Grid helpers ───────────────────────────────────────────────────────── */
+.kd-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-sm);
+}
+@media (max-width: 359px) {
+  .kd-grid-2 { grid-template-columns: 1fr; }
+}
+
+.kd-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-sm);
+}
+@media (max-width: 399px) {
+  .kd-grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+.kd-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--sp-sm);
+}
+@media (max-width: 599px) {
+  .kd-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ─── Text scale helpers ─────────────────────────────────────────────────── */
+.kd-text-xs   { font-size: var(--fs-xs);   }
+.kd-text-sm   { font-size: var(--fs-sm);   }
+.kd-text-base { font-size: var(--fs-base); }
+.kd-text-md   { font-size: var(--fs-md);   }
+.kd-text-lg   { font-size: var(--fs-lg);   }
+.kd-text-xl   { font-size: var(--fs-xl);   }
+
+/* ─── Countdown badge colors ─────────────────────────────────────────────── */
+.countdown-urgent  { color: #EE8585; font-weight: 700; }
+.countdown-soon    { color: #F0A030; font-weight: 700; }
+.countdown-ok      { color: #8EC44A; font-weight: 600; }
+.countdown-overdue { color: #D04040; font-weight: 800; }
+
+/* ─── Utilities ──────────────────────────────────────────────────────────── */
+.animate-fade-in { animation: fadeIn 0.5s ease-out; }
+.glass-card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.bottom-nav-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
