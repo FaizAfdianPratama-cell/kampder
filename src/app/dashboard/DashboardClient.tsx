@@ -11,7 +11,7 @@ import { format } from "date-fns";
 import { id as idLocale, enUS } from "date-fns/locale";
 import { getCountdown } from "@/lib/utils";
 import { useApp } from "@/components/AppContext";
-
+import InstallAppCard from "@/components/InstallAppCard";
 interface Task {
   id: string; name: string; subject: string;
   deadline: string; priority: "TERTINGGI" | "TINGGI" | "SEDANG" | "RENDAH";
@@ -142,6 +142,7 @@ export default function DashboardClient({ userName, tasks, income, expense, inve
           BODY
       ══════════════════════════════════════════════════════════════════════ */}
       <div style={{ padding: "14px var(--page-pad)", display: "flex", flexDirection: "column", gap: 14 }}>
+        <InstallAppCard />
 
         {/* ── Overdue Alert Banner ─────────────────────────────────────────── */}
         {overdueTasks.length > 0 && (
