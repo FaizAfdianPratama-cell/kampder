@@ -1,7 +1,3 @@
-// Service worker gabungan: PWA basic + OneSignal Web Push
-// File ini HARUS berada di /public/sw.js (root, bukan di dalam folder)
-
-// Import OneSignal worker supaya push notification tetap berfungsi
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
 const CACHE_NAME = "kampder-cache-v1";
@@ -14,9 +10,9 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-// Strategi cache sederhana: network-first, fallback ke cache kalau offline
-self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
+jsself.addEventListener("fetch", (event) => {
+  const url = new URL(event.request.url);
+  if (event.request.method !== "GET" || url.origin !== self.location.origin) return;
 
   event.respondWith(
     fetch(event.request)
