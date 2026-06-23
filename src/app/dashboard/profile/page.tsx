@@ -82,15 +82,12 @@ export default function ProfilePage() {
   // NEXTAUTH_URL/AUTH_URL di server. Kalau env itu beda dari origin yang
   // sedang dipakai user (mis. server di-set ke localhost:3000 tapi user
   // browsing dari IP LAN seperti 192.168.x.x:3000), redirect bisa "lompat"
-  // origin → sessionStorage flag "kampder_from" ketinggalan di origin lama
-  // → LoadingScreen muncul lagi di halaman login, dan request CSRF/signout
-  // bisa gagal beda-beda tergantung device (itu sumber "kadang-kadang error").
+  // origin dan request CSRF/signout bisa gagal beda-beda tergantung device.
   // Fix: redirect:false dulu (biar tidak ada navigasi otomatis), baru kita
   // navigate manual pakai path RELATIF — selalu same-origin dengan tab yang
   // sedang dibuka, device apa pun, IP apa pun.
   async function handleLogout() {
     setLoggingOut(true);
-    try { sessionStorage.setItem("kampder_from", "logout"); } catch {}
     try {
       await signOut({ redirect: false });
     } catch {
