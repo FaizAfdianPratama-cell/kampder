@@ -3,7 +3,6 @@
 "use client";
 import { useRef, useState } from "react";
 import { signIn } from "next-auth/react";
-import LoadingScreen from "@/components/LoadingScreen";
 import { useApp } from "@/components/AppContext";
 
 import { AuthShell, LogoBlock, AuthCard, TabSwitcher } from "@/components/auth/AuthShell";
@@ -15,23 +14,8 @@ import NewPassForm from "@/components/auth/NewPassForm";
 import SuccessView from "@/components/auth/SuccessView";
 import type { AuthMode, FormState } from "@/components/auth/types";
 
-type Step = "loading" | "auth";
-
 export default function LoginPage() {
   const { t, lang } = useApp();
-
-  // ── Baca sessionStorage saat inisialisasi (lazy, client-only) ─────────────
-  const [step, setStep] = useState<Step>(() => {
-    if (typeof window === "undefined") return "loading";
-    try {
-      const from = sessionStorage.getItem("kampder_from");
-      if (from === "logout") {
-        sessionStorage.removeItem("kampder_from");
-        return "auth";
-      }
-    } catch {}
-    return "loading";
-  });
 
   const [mode, setMode] = useState<AuthMode>("login");
   const [form, setForm] = useState<FormState>({ name: "", email: "", password: "", confirm: "" });
@@ -70,11 +54,7 @@ export default function LoginPage() {
       setErr(t("Email atau password salah", "Incorrect email or password"));
       setLoading(false);
     } else {
-      // Tandai dashboard sudah "pernah dimuat" SEBELUM redirect, supaya
-      // LoadingScreen di dashboard/layout.tsx tidak muncul lagi — user
-      // sudah menunggu cukup lama di proses login, tidak perlu nunggu lagi.
-      try { sessionStorage.setItem("kampder_dashboard_loaded", "1"); } catch {}
-      // Hard navigate — bypass client router agar LoadingScreen tidak muncul lagi
+      // Hard navigate — bypass client router agar transisi ke dashboard bersih
       window.location.href = "/dashboard";
     }
   }
@@ -135,10 +115,6 @@ export default function LoginPage() {
     if (e.key === "Backspace" && !otpCode[idx] && idx > 0) otpRefs.current[idx - 1]?.focus();
   }
 
-  // ── Routing ──────────────────────────────────────────────────────────────
-
-  if (step === "loading") return <LoadingScreen onDone={() => setStep("auth")} />;
-
   // ── LOGIN & REGISTER share the tabbed card ─────────────────────────────
   if (mode === "login" || mode === "register") return (
     <AuthShell>
@@ -170,10 +146,7 @@ export default function LoginPage() {
     <AuthShell>
       <LogoBlock />
       <AuthCard>
-        <SuccessView onContinue={() => {
-          try { sessionStorage.setItem("kampder_dashboard_loaded", "1"); } catch {}
-          window.location.href = "/dashboard";
-        }} />
+        <SuccessView onContinue={() => { window.location.href = "/dashboard"; }} />
       </AuthCard>
     </AuthShell>
   );
