@@ -1,42 +1,48 @@
+// src/components/OneSignalInit.tsx
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useSession } from "next-auth/react";
 import OneSignal from "react-onesignal";
 
 let initialized = false;
-const NOTIF_PROMPT_KEY = "kampder-notif-prompted";
 
 export default function OneSignalInit() {
+  const { data: session, status } = useSession();
+  const loggedInId = useRef<string | null>(null);
+
   useEffect(() => {
     if (initialized) return;
     initialized = true;
 
     OneSignal.init({
       appId: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID as string,
+      // izinkan testing di localhost (http), tetap wajib HTTPS di production
       allowLocalhostAsSecureOrigin: true,
+      // pakai service worker custom yang sudah ada (gabungan PWA cache + OneSignal)
       serviceWorkerPath: "/sw.js",
       serviceWorkerParam: { scope: "/" },
-    })
-      .then(() => {
-        // Cek: app sedang dibuka sebagai PWA terinstall (standalone)?
-        const isStandalone =
-          window.matchMedia("(display-mode: standalone)").matches ||
-          (window.navigator as unknown as { standalone?: boolean }).standalone === true;
-
-        const alreadyPrompted = localStorage.getItem(NOTIF_PROMPT_KEY) === "1";
-        const canAsk = typeof window !== "undefined" && "Notification" in window && Notification.permission === "default";
-
-        // Minta izin sekali aja, hanya kalau dibuka dari home screen (bukan tab browser biasa)
-        if (isStandalone && !alreadyPrompted && canAsk) {
-          localStorage.setItem(NOTIF_PROMPT_KEY, "1");
-          OneSignal.Notifications.requestPermission().catch((err) => {
-            console.error("Gagal minta izin notifikasi (standalone):", err);
-          });
-        }
-      })
-      .catch((err) => {
-        console.error("OneSignal init error:", err);
-      });
+    }).catch((err) => {
+      console.error("OneSignal init error:", err);
+    });
   }, []);
+
+  // Hubungkan device OneSignal ke akun user yang sedang login (pakai userId
+  // sebagai "external_id"), supaya notifikasi reminder bisa ditarget ke
+  // user yang spesifik lewat REST API. Dilepas lagi saat logout, supaya
+  // device yang dipakai bergantian gak ke-notif untuk akun yang salah.
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.id) {
+      if (loggedInId.current !== session.user.id) {
+        OneSignal.login(session.user.id).catch((err) => {
+          console.error("OneSignal login error:", err);
+        });
+        loggedInId.current = session.user.id;
+      }
+    } else if (status === "unauthenticated" && loggedInId.current) {
+      OneSignal.logout().catch(() => {});
+      loggedInId.current = null;
+    }
+  }, [status, session?.user?.id]);
 
   return null;
 }
