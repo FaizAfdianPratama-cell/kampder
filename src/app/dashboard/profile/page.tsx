@@ -11,6 +11,7 @@ import {
   Award,
 } from "lucide-react";
 import { useApp, FONT_LABELS } from "@/components/AppContext";
+import EnableNotificationsButton from "@/components/EnableNotificationsButton";
 
 export default function ProfilePage() {
   const { t, theme, lang, font, colors } = useApp();
@@ -244,6 +245,9 @@ export default function ProfilePage() {
             ))}
           </div>
         </div>
+
+        {/* Notifikasi */}
+        <EnableNotificationsButton />
 
         {/* Logout */}
         <button
